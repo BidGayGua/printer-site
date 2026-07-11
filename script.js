@@ -189,6 +189,7 @@ async function submitRequest() {
         `• Ответственный: ${name}`,
         `• Проблема: ${problemType}`,
         `• Комментарий: ${comment}`,
+        '• Статус: 🔴 В работе',
         '',
         '👉 Мастер: поставьте реакцию ✅ или 👍 на это сообщение, когда выполните заявку.'
     ].join('\n');
@@ -206,7 +207,14 @@ async function submitRequest() {
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams({
                     chat_id: TELEGRAM_CHAT_ID,
-                    text: message
+                    text: message,
+                    reply_markup: JSON.stringify({
+                        inline_keyboard: [
+                            [
+                                { text: "✅ Отметить выполненной", url: `https://printer-site-psi.vercel.app/complete.html?id=${printerId}` }
+                            ]
+                        ]
+                    })
                 })
             }
         );

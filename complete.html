@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Завершение заявки</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body { font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; background: #F8FAFC; margin: 0; }
+    .card { background: white; padding: 30px; border-radius: 20px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+    h2 { color: #16A34A; margin-bottom: 10px; }
+    p { color: #64748B; }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h2 id="status-title">⏳ Обновляем статус...</h2>
+    <p id="status-desc">Пожалуйста, подождите</p>
+  </div>
+
+  <script>
+    // Вставь сюда свои ключи Supabase (как в script.js)
+    const SUPABASE_URL = "https://wxkqfkjaretsqzdfnzhw.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4a3Fma2phcmV0c3F6ZGZuemh3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM3MDM1NTMsImV4cCI6MjA5OTI3OTU1M30.7ztRTIZM9ytG9LLCFE5pvVTEpV9re5IrxIomMrJxVKw";
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const printerId = urlParams.get('id');
+
+    async function completeOrder() {
+      if (!printerId) {
+        document.getElementById('status-title').innerText = "❌ Ошибка";
+        document.getElementById('status-desc').innerText = "ID заявки не найден";
+        return;
+      }
+
+      const { error } = await supabase
+        .from('printers')
+        .update({ status: 'Выполнено' })
+        .eq('id', printerId);
+
+      if (error) {
+        document.getElementById('status-title').innerText = "❌ Ошибка";
+        document.getElementById('status-desc').innerText = error.message;
+      } else {
+        document.getElementById('status-title').innerText = "✅ Заявка выполнена!";
+        document.getElementById('status-desc').innerText = `Статус принтера ${printerId} успешно обновлен на "Выполнено".`;
+      }
+    }
+
+    completeOrder();
+  </script>
+</body>
+</html>
