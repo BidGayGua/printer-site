@@ -188,10 +188,7 @@ async function submitRequest() {
         `• Адрес: ${address}`,
         `• Ответственный: ${name}`,
         `• Проблема: ${problemType}`,
-        `• Комментарий: ${comment}`,
-        '• Статус: 🔴 В работе',
-        '',
-        '👉 Мастер: поставьте реакцию ✅ или 👍 на это сообщение, когда выполните заявку.'
+        `• Комментарий: ${comment}`
     ].join('\n');
 
     if (submitBtn) {
@@ -211,7 +208,7 @@ async function submitRequest() {
             body: JSON.stringify({ status: 'Заявка отправлена' })
         });
 
-        const response = await fetch(
+        await fetch(
             `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
             {
                 method: 'POST',
@@ -222,41 +219,6 @@ async function submitRequest() {
                 })
             }
         );
-
-        let messageId = null;
-        if (response.type !== 'opaque') {
-            const res = await response.json();
-            if (res.ok !== true) {
-                throw new Error(res.description || 'Ошибка Telegram API');
-            }
-            messageId = res.result.message_id;
-        }
-
-        if (messageId) {
-            const replyMarkupResponse = await fetch(
-                `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/editMessageReplyMarkup`,
-                {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: new URLSearchParams({
-                        chat_id: TELEGRAM_CHAT_ID,
-                        message_id: messageId,
-                        reply_markup: JSON.stringify({
-                            inline_keyboard: [
-                                [
-                                    { text: "✅ Отметить выполненной", url: `https://printer-site-psi.vercel.app/complete.html?id=${printerId}&msg_id=${messageId}` }
-                                ]
-                            ]
-                        })
-                    })
-                }
-            );
-
-            const replyMarkupData = await replyMarkupResponse.json();
-            if (replyMarkupData.ok !== true) {
-                throw new Error(replyMarkupData.description || 'Ошибка добавления кнопки Telegram');
-            }
-        }
 
         currentPrinterData.status = 'Заявка отправлена';
         if (infoText) {
