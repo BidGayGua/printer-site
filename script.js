@@ -1,0 +1,232 @@
+const SUPABASE_BASE_URL = "https://wxkqfkjaretsqzdfnzhw.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4a3Fma2phcmV0c3F6ZGZuemh3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM3MDM1NTMsImV4cCI6MjA5OTI3OTU1M30.7ztRTIZM9ytG9LLCFE5pvVTEpV9re5IrxIomMrJxVKw";
+
+let currentPrinterId = null;
+
+// 1. ОТПРАВКА ДАННЫХ ИЗ ГЕНЕРАТОРА (generator.html)
+const orderForm = document.getElementById('orderForm');
+if (orderForm) {
+    orderForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const nameInput = document.getElementById('nameInput');
+        const modelInput = document.getElementById('modelInput');
+        const addressInput = document.getElementById('addressInput');
+
+        const name = nameInput ? nameInput.value.trim() : '';
+        const model = modelInput ? modelInput.value.trim() : '';
+        const address = addressInput ? addressInput.value.trim() : '';
+        const textId = 'PR-' + Math.floor(100 + Math.random() * 900);
+
+        const submitBtn = orderForm.querySelector('button[type="submit"]');
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Сохраняем…';
+        }
+
+        try {
+            const response = await fetch(`${SUPABASE_BASE_URL}/rest/v1/printers`, {
+                method: 'POST',
+                headers: {
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify({
+                    id: textId,
+                    model: model,
+                    address: address,
+                    status: 'Новый',
+                    name: name
+                })
+            });
+
+            if (response.ok) {
+                const baseUrl = window.location.href.replace(/[^/]*$/, '').replace(/\/$/, '');
+                const fullUrl = `${baseUrl}/index.html?id=${textId}`;
+                const qrContainer = document.getElementById('qrcode');
+                const qrResult = document.getElementById('qrResult');
+                const qrUrl = document.getElementById('qrUrl');
+                const qrPrinterId = document.getElementById('qrPrinterId');
+
+                if (qrContainer) {
+                    qrContainer.innerHTML = '';
+                    new QRCode(qrContainer, {
+                        text: fullUrl,
+                        width: 200,
+                        height: 200
+                    });
+                }
+
+                if (qrPrinterId) {
+                    qrPrinterId.textContent = `ID: ${textId}`;
+                }
+
+                if (qrUrl) {
+                    qrUrl.innerHTML = `<a href="${fullUrl}" target="_blank" rel="noopener">${fullUrl}</a>`;
+                }
+
+                if (qrResult) {
+                    qrResult.classList.remove('hidden');
+                }
+
+                qrResult?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            } else {
+                alert('Ошибка при отправке данных в базу.');
+            }
+        } catch (error) {
+            console.error('Ошибка сети:', error);
+            alert('Не удалось связаться с базой данных.');
+        } finally {
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Сгенерировать и отправить в базу';
+            }
+        }
+    });
+}
+
+// 2. ПОЛУЧЕНИЕ ДАННЫХ И ОТОБРАЖЕНИЕ (index.html)
+async function loadPrinterData() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const printerId = urlParams.get('id');
+
+    const removeLoader = () => {
+        const loader = document.getElementById('loader')
+                    || document.getElementById('loading')
+                    || document.querySelector('.loader')
+                    || document.querySelector('.loading-state');
+        if (loader) {
+            loader.remove();
+        }
+    };
+
+    const errorBlock = document.getElementById('error');
+    const contentBlock = document.getElementById('content');
+    const infoText = document.getElementById('info-text');
+    const greetingText = document.getElementById('greeting-text');
+
+    if (!printerId) {
+        removeLoader();
+        if (errorBlock) errorBlock.classList.remove('hidden');
+        return;
+    }
+
+    currentPrinterId = printerId;
+
+    try {
+        const response = await fetch(`${SUPABASE_BASE_URL}/rest/v1/printers?id=eq.${printerId}`, {
+            method: 'GET',
+            headers: {
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+            }
+        });
+
+        const data = await response.json();
+
+        removeLoader();
+
+        if (data && data.length > 0) {
+            const printer = data[0];
+
+            if (greetingText && printer.name) {
+                greetingText.textContent = `Здравствуйте, ${printer.name}!`;
+            }
+
+            if (infoText) {
+                const responsible = printer.name || '—';
+                infoText.innerHTML = `
+                    <span class="highlight">Модель:</span> ${printer.model}<br>
+                    <span class="highlight">Адрес:</span> ${printer.address}<br>
+                    <span class="highlight">Ответственный:</span> ${responsible} · <span class="highlight">Статус:</span> ${printer.status}
+                `;
+            }
+
+            if (contentBlock) {
+                contentBlock.classList.remove('hidden');
+            }
+        } else {
+            if (errorBlock) errorBlock.classList.remove('hidden');
+        }
+    } catch (error) {
+        console.error('Ошибка:', error);
+        removeLoader();
+        if (errorBlock) errorBlock.classList.remove('hidden');
+    }
+}
+
+// 3. ОТПРАВКА ЗАЯВКИ КЛИЕНТОМ (index.html)
+async function submitRequest() {
+    if (!currentPrinterId) return;
+
+    const submitBtn = document.getElementById('submit-btn');
+    const commentField = document.getElementById('comment');
+    const formCard = document.getElementById('form-card');
+    const successBlock = document.getElementById('success');
+    const activeTab = document.querySelector('.tab.active');
+
+    const problemType = activeTab?.dataset.problem === 'repair'
+        ? 'Ремонт'
+        : 'Замена картриджа';
+    const comment = commentField ? commentField.value.trim() : '';
+
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Отправляем…';
+    }
+
+    try {
+        const response = await fetch(`${SUPABASE_BASE_URL}/rest/v1/requests`, {
+            method: 'POST',
+            headers: {
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=minimal'
+            },
+            body: JSON.stringify({
+                printer_id: currentPrinterId,
+                problem_type: problemType,
+                comment: comment,
+                status: 'Новая'
+            })
+        });
+
+        if (response.ok) {
+            if (formCard) formCard.classList.add('hidden');
+            if (successBlock) successBlock.classList.remove('hidden');
+        } else {
+            alert('Не удалось отправить заявку. Попробуйте позже.');
+        }
+    } catch (error) {
+        console.error('Ошибка:', error);
+        alert('Не удалось связаться с сервером.');
+    } finally {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Отправить заявку';
+        }
+    }
+}
+
+document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('tab')) {
+        document.querySelectorAll('.tab').forEach(t => {
+            t.classList.remove('active');
+            t.setAttribute('aria-selected', 'false');
+        });
+        e.target.classList.add('active');
+        e.target.setAttribute('aria-selected', 'true');
+    }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadPrinterData();
+
+    const submitBtn = document.getElementById('submit-btn');
+    if (submitBtn) {
+        submitBtn.addEventListener('click', submitRequest);
+    }
+});
