@@ -1,7 +1,14 @@
 const SUPABASE_BASE_URL = "https://wxkqfkjaretsqzdfnzhw.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4a3Fma2phcmV0c3F6ZGZuemh3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM3MDM1NTMsImV4cCI6MjA5OTI3OTU1M30.7ztRTIZM9ytG9LLCFE5pvVTEpV9re5IrxIomMrJxVKw";
+const TELEGRAM_BOT_TOKEN = "8998606162:AAE_prALU6AkZqWQ_bQV4mjXNqaji1Uw-rk";
+const TELEGRAM_CHAT_ID = "935909798";
 
 let currentPrinterId = null;
+let currentPrinterData = null;
+
+function escapeTelegramMarkdown(text) {
+    return String(text || '—').replace(/([_*`\[])/g, '\\$1');
+}
 
 // 1. ОТПРАВКА ДАННЫХ ИЗ ГЕНЕРАТОРА (generator.html)
 const orderForm = document.getElementById('orderForm');
@@ -130,6 +137,7 @@ async function loadPrinterData() {
 
         if (data && data.length > 0) {
             const printer = data[0];
+            currentPrinterData = printer;
 
             if (greetingText && printer.name) {
                 greetingText.textContent = `Здравствуйте, ${printer.name}!`;
@@ -159,18 +167,29 @@ async function loadPrinterData() {
 
 // 3. ОТПРАВКА ЗАЯВКИ КЛИЕНТОМ (index.html)
 async function submitRequest() {
-    if (!currentPrinterId) return;
+    if (!currentPrinterId || !currentPrinterData) return;
 
     const submitBtn = document.getElementById('submit-btn');
     const commentField = document.getElementById('comment');
-    const formCard = document.getElementById('form-card');
-    const successBlock = document.getElementById('success');
+    const infoText = document.getElementById('info-text');
     const activeTab = document.querySelector('.tab.active');
 
-    const problemType = activeTab?.dataset.problem === 'repair'
-        ? 'Ремонт'
-        : 'Замена картриджа';
-    const comment = commentField ? commentField.value.trim() : '';
+    const problemType = activeTab ? activeTab.textContent.trim() : 'Не указана';
+    const comment = commentField ? commentField.value.trim() : '—';
+    const printerId = currentPrinterId;
+    const model = currentPrinterData.model || '—';
+    const address = currentPrinterData.address || '—';
+    const name = currentPrinterData.name || '—';
+
+    const message = [
+        '🚨 *Новая заявка на обслуживание!*',
+        `• *ID принтера:* ${escapeTelegramMarkdown(printerId)}`,
+        `• *Модель:* ${escapeTelegramMarkdown(model)}`,
+        `• *Адрес:* ${escapeTelegramMarkdown(address)}`,
+        `• *Ответственный:* ${escapeTelegramMarkdown(name)}`,
+        `• *Проблема:* ${escapeTelegramMarkdown(problemType)}`,
+        `• *Комментарий:* ${escapeTelegramMarkdown(comment)}`
+    ].join('\n');
 
     if (submitBtn) {
         submitBtn.disabled = true;
@@ -178,31 +197,54 @@ async function submitRequest() {
     }
 
     try {
-        const response = await fetch(`${SUPABASE_BASE_URL}/rest/v1/requests`, {
-            method: 'POST',
+        const telegramResponse = await fetch(
+            `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({
+                    chat_id: TELEGRAM_CHAT_ID,
+                    text: message,
+                    parse_mode: 'Markdown'
+                })
+            }
+        );
+
+        let telegramOk = telegramResponse.type === 'opaque';
+        if (!telegramOk) {
+            const telegramData = await telegramResponse.json();
+            telegramOk = telegramData.ok === true;
+            if (!telegramOk) {
+                throw new Error(telegramData.description || 'Ошибка Telegram API');
+            }
+        }
+
+        await fetch(`${SUPABASE_BASE_URL}/rest/v1/printers?id=eq.${printerId}`, {
+            method: 'PATCH',
             headers: {
                 'apikey': SUPABASE_ANON_KEY,
                 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
                 'Content-Type': 'application/json',
                 'Prefer': 'return=minimal'
             },
-            body: JSON.stringify({
-                printer_id: currentPrinterId,
-                problem_type: problemType,
-                comment: comment,
-                status: 'Новая'
-            })
+            body: JSON.stringify({ status: 'Заявка отправлена' })
         });
 
-        if (response.ok) {
-            if (formCard) formCard.classList.add('hidden');
-            if (successBlock) successBlock.classList.remove('hidden');
-        } else {
-            alert('Не удалось отправить заявку. Попробуйте позже.');
+        currentPrinterData.status = 'Заявка отправлена';
+        if (infoText) {
+            const responsible = currentPrinterData.name || '—';
+            infoText.innerHTML = `
+                <span class="highlight">Модель:</span> ${currentPrinterData.model}<br>
+                <span class="highlight">Адрес:</span> ${currentPrinterData.address}<br>
+                <span class="highlight">Ответственный:</span> ${responsible} · <span class="highlight">Статус:</span> Заявка отправлена
+            `;
         }
+
+        if (commentField) commentField.value = '';
+        alert('Заявка успешно отправлена! Мастер уже получил уведомление.');
     } catch (error) {
         console.error('Ошибка:', error);
-        alert('Не удалось связаться с сервером.');
+        alert('Не удалось отправить заявку. Попробуйте позже.');
     } finally {
         if (submitBtn) {
             submitBtn.disabled = false;
