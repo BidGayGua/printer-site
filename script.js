@@ -207,24 +207,45 @@ async function submitRequest() {
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams({
                     chat_id: TELEGRAM_CHAT_ID,
-                    text: message,
-                    reply_markup: JSON.stringify({
-                        inline_keyboard: [
-                            [
-                                { text: "✅ Отметить выполненной", url: `https://printer-site-psi.vercel.app/complete.html?id=${printerId}` }
-                            ]
-                        ]
-                    })
+                    text: message
                 })
             }
         );
 
         let telegramOk = telegramResponse.type === 'opaque';
+        let sentMessageId = null;
         if (!telegramOk) {
             const telegramData = await telegramResponse.json();
             telegramOk = telegramData.ok === true;
             if (!telegramOk) {
                 throw new Error(telegramData.description || 'Ошибка Telegram API');
+            }
+            sentMessageId = telegramData.result?.message_id;
+        }
+
+        if (sentMessageId) {
+            const replyMarkupResponse = await fetch(
+                `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/editMessageReplyMarkup`,
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({
+                        chat_id: TELEGRAM_CHAT_ID,
+                        message_id: sentMessageId,
+                        reply_markup: JSON.stringify({
+                            inline_keyboard: [
+                                [
+                                    { text: "✅ Отметить выполненной", url: `https://printer-site-psi.vercel.app/complete.html?id=${printerId}&msg_id=${sentMessageId}` }
+                                ]
+                            ]
+                        })
+                    })
+                }
+            );
+
+            const replyMarkupData = await replyMarkupResponse.json();
+            if (replyMarkupData.ok !== true) {
+                throw new Error(replyMarkupData.description || 'Ошибка добавления кнопки Telegram');
             }
         }
 
