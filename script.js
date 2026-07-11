@@ -182,14 +182,15 @@ async function submitRequest() {
     const name = currentPrinterData.name || '—';
 
     const message = [
-        '🚨 *Новая заявка на обслуживание!*',
-        `• *ID принтера:* ${escapeTelegramMarkdown(printerId)}`,
-        `• *Модель:* ${escapeTelegramMarkdown(model)}`,
-        `• *Адрес:* ${escapeTelegramMarkdown(address)}`,
-        `• *Ответственный:* ${escapeTelegramMarkdown(name)}`,
-        `• *Проблема:* ${escapeTelegramMarkdown(problemType)}`,
-        `• *Комментарий:* ${escapeTelegramMarkdown(comment)}`,
-        '• Статус: 🔴 В работе'
+        '🚨 Новая заявка на обслуживание!',
+        `• ID принтера: ${printerId}`,
+        `• Модель: ${model}`,
+        `• Адрес: ${address}`,
+        `• Ответственный: ${name}`,
+        `• Проблема: ${problemType}`,
+        `• Комментарий: ${comment}`,
+        '',
+        '👉 Мастер: поставьте реакцию ✅ или 👍 на это сообщение, когда выполните заявку.'
     ].join('\n');
 
     if (submitBtn) {
@@ -205,15 +206,7 @@ async function submitRequest() {
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams({
                     chat_id: TELEGRAM_CHAT_ID,
-                    text: message,
-                    parse_mode: 'Markdown',
-                    reply_markup: JSON.stringify({
-                        inline_keyboard: [
-                            [
-                                { text: "➡️ Завершить заявку", callback_data: "finish_order" }
-                            ]
-                        ]
-                    })
+                    text: message
                 })
             }
         );
