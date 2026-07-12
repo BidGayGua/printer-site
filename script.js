@@ -279,6 +279,20 @@ async function submitRequest() {
       })
     });
 
+    if (window.emailjs) {
+      emailjs.send('service_iz7nwnb', 'template_jk2ug5i', {
+        printer_id: printerId,
+        model: model,
+        cartridge: cartridge,
+        address: address,
+        name: name,
+        problem: problemType,
+        comment: comment,
+        visit_time: `${visitDay}, ${visitTime}`,
+        last_service: currentPrinterData.last_service || 'Нет данных'
+      }).catch(err => console.error('Ошибка Email:', err));
+    }
+
     currentPrinterData.status = 'Заявка отправлена';
     if (infoText) {
       const responsible = currentPrinterData.name || '-';
