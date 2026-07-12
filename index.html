@@ -95,6 +95,19 @@
       font-weight: 700;
     }
 
+    .service-note {
+      margin-top: 18px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: #EEF6FF;
+      border: 1px solid #DBEAFE;
+      color: var(--text);
+      font-size: 0.875rem;
+      font-weight: 600;
+      line-height: 1.5;
+      text-align: left;
+    }
+
     .loader {
       display: flex;
       flex-direction: column;
@@ -408,6 +421,7 @@
         <div class="logo">🖨️</div>
         <h1 id="greeting-text">Здравствуйте!</h1>
         <p id="info-text"></p>
+        <div id="last-service-info" class="service-note">🛠 Последнее обслуживание: Информация отсутствует</div>
       </div>
 
       <div id="form-card" class="card form-section">

@@ -96,6 +96,47 @@ if (orderForm) {
     });
 }
 
+const saveServiceBtn = document.getElementById('saveServiceBtn');
+if (saveServiceBtn) {
+    saveServiceBtn.addEventListener('click', async () => {
+        const printerId = document.getElementById('updatePrinterId')?.value.trim();
+        const serviceText = document.getElementById('updateServiceText')?.value.trim();
+
+        if (!printerId || !serviceText) {
+            alert('Введите ID принтера и описание проведенных работ.');
+            return;
+        }
+
+        saveServiceBtn.disabled = true;
+        saveServiceBtn.textContent = 'Сохраняем...';
+
+        try {
+            const response = await fetch(`${SUPABASE_BASE_URL}/rest/v1/printers?id=eq.${printerId}`, {
+                method: 'PATCH',
+                headers: {
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify({ last_service: serviceText })
+            });
+
+            if (!response.ok) {
+                throw new Error('Ошибка Supabase');
+            }
+
+            alert('История обслуживания успешно обновлена!');
+        } catch (error) {
+            console.error('Ошибка:', error);
+            alert('Не удалось обновить историю обслуживания. Попробуйте позже.');
+        } finally {
+            saveServiceBtn.disabled = false;
+            saveServiceBtn.textContent = 'Сохранить обслуживание';
+        }
+    });
+}
+
 // 2. ПОЛУЧЕНИЕ ДАННЫХ И ОТОБРАЖЕНИЕ (index.html)
 async function loadPrinterData() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -115,6 +156,7 @@ async function loadPrinterData() {
     const contentBlock = document.getElementById('content');
     const infoText = document.getElementById('info-text');
     const greetingText = document.getElementById('greeting-text');
+    const lastServiceInfo = document.getElementById('last-service-info');
 
     if (!printerId) {
         removeLoader();
@@ -154,6 +196,10 @@ async function loadPrinterData() {
                 `;
             }
 
+            if (lastServiceInfo) {
+                lastServiceInfo.textContent = `🛠 Последнее обслуживание: ${currentPrinterData.last_service || 'Информация отсутствует'}`;
+            }
+
             if (contentBlock) {
                 contentBlock.classList.remove('hidden');
             }
@@ -187,6 +233,7 @@ async function submitRequest() {
   const cartridge = currentPrinterData.cartridge_number || 'Не указан';
   const address = currentPrinterData.address || '-';
   const name = currentPrinterData.name || '-';
+  const lastService = currentPrinterData.last_service || 'Нет данных';
 
   const visitDay = visitDaySelect ? visitDaySelect.value : 'Сегодня';
   const selectedVisitTime = visitTimeSelect ? visitTimeSelect.value : 'В течение дня';
@@ -202,6 +249,7 @@ async function submitRequest() {
     `• Ответственный: ${name}`,
     `• Проблема: ${problemType}`,
     `• Комментарий: ${comment}`,
+    `• Прошлое обслуживание: ${lastService}`,
     `• Удобное время: ${visitDay}, ${visitTime}`
   ].join('\n');
 
