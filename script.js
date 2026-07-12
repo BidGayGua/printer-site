@@ -86,7 +86,6 @@ if (orderForm) {
           cartridge_number: cartridge,
           address,
           status: "Новый",
-          location_note: address
         })
       });
 
