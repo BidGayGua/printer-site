@@ -19,12 +19,11 @@ if (orderForm) {
         const nameInput = document.getElementById('nameInput');
     const modelInput = document.getElementById('modelInput');
     const addressInput = document.getElementById('addressInput');
-    const cartridgeInput = document.getElementById('cartridgeInput');
 
     const name = nameInput ? nameInput.value.trim() : '';
     const model = modelInput ? modelInput.value.trim() : '';
     const address = addressInput ? addressInput.value.trim() : '';
-    const cartridge = cartridgeInput ? cartridgeInput.value.trim() : '';
+    const cartridge = document.getElementById('cartridgeNumber')?.value.trim() || 'Не указан';
     const textId = 'PR-' + Math.floor(100 + Math.random() * 900);
 
     const submitBtn = orderForm.querySelector('button[type="submit"]');
@@ -179,6 +178,7 @@ async function submitRequest() {
 
   const visitDaySelect = document.getElementById('visitDay');
   const visitTimeSelect = document.getElementById('visitTime');
+  const customTimeInput = document.getElementById('customTimeInput');
 
   const problemType = activeTab ? activeTab.textContent.trim() : 'Не указана';
   const comment = commentField ? commentField.value.trim() : '-';
@@ -189,7 +189,9 @@ async function submitRequest() {
   const name = currentPrinterData.name || '-';
 
   const visitDay = visitDaySelect ? visitDaySelect.value : 'Сегодня';
-  const visitTime = visitTimeSelect ? visitTimeSelect.value : 'В течение дня';
+  const selectedVisitTime = visitTimeSelect ? visitTimeSelect.value : 'В течение дня';
+  const customVisitTime = customTimeInput ? customTimeInput.value.trim() : '';
+  const visitTime = selectedVisitTime === 'custom' ? (customVisitTime || 'Не указано') : selectedVisitTime;
 
   const message = [
     '🚨 Новая заявка на обслуживание!',
@@ -265,6 +267,19 @@ document.addEventListener('click', (e) => {
 
 document.addEventListener('DOMContentLoaded', () => {
     loadPrinterData();
+
+    const visitTimeSelect = document.getElementById('visitTime');
+    const customTimeInput = document.getElementById('customTimeInput');
+    const toggleCustomTimeInput = () => {
+        if (customTimeInput && visitTimeSelect) {
+            customTimeInput.style.display = visitTimeSelect.value === 'custom' ? 'block' : 'none';
+        }
+    };
+
+    if (visitTimeSelect) {
+        visitTimeSelect.addEventListener('change', toggleCustomTimeInput);
+        toggleCustomTimeInput();
+    }
 
     const submitBtn = document.getElementById('submit-btn');
     if (submitBtn) {
