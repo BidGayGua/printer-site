@@ -1,5 +1,7 @@
 const SUPABASE_BASE_URL = "https://wxkqfkjaretsqzdfnzhw.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4a3Fma2phcmV0c3F6ZGZuemh3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM3MDM1NTMsImV4cCI6MjA5OTI3OTU1M30.7ztRTIZM9ytG9LLCFE5pvVTEpV9re5IrxIomMrJxVKw";
+const TELEGRAM_BOT_TOKEN = "8998606162:AAE_prALU6AkZqWQ_bQV4mjXNqaji1Uw-rk";
+const TELEGRAM_CHAT_ID = "935909798";
 
 let clientPhone = "";
 let clientData = null;
@@ -11,6 +13,13 @@ const supabaseClient = window.supabase
   : null;
 
 const normalizePhone = (value) => String(value || "").trim();
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
 
 function setBusy(button, isBusy, busyText, idleText) {
   if (!button) return;
@@ -40,6 +49,42 @@ async function requestRest(path, options = {}) {
       ...(options.headers || {})
     }
   });
+}
+
+async function sendTelegramRequest({ selectedPrinters, serviceType, visitTime, comment }) {
+  const printerLines = selectedPrinters
+    .map((printer) => `• ${escapeHtml(printer.model || "Модель не указана")} (${escapeHtml(printer.id)})`)
+    .join("\n");
+
+  const text = [
+    "<b>Новая заявка на обслуживание принтера</b>",
+    "",
+    `<b>Клиент:</b> ${escapeHtml(clientData?.name || "Не указан")}`,
+    `<b>Телефон:</b> ${escapeHtml(clientPhone)}`,
+    `<b>Услуга:</b> ${escapeHtml(serviceType)}`,
+    `<b>Время:</b> ${escapeHtml(visitTime)}`,
+    `<b>Комментарий:</b> ${escapeHtml(comment || "Без комментария")}`,
+    "",
+    "<b>Принтеры:</b>",
+    printerLines
+  ].join("\n");
+
+  const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      chat_id: TELEGRAM_CHAT_ID,
+      text,
+      parse_mode: "HTML"
+    })
+  });
+
+  console.log("Telegram API status:", response.status);
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Telegram API error ${response.status}: ${errorText}`);
+  }
 }
 
 function generatePrinterId() {
@@ -364,8 +409,15 @@ async function submitClientRequest(event) {
 
     if (statusResult.error) throw statusResult.error;
 
-    document.getElementById("commentInput").value = "";
-    checkedPrinters.forEach((item) => { item.checked = false; });
+    await sendTelegramRequest({ selectedPrinters, serviceType, visitTime, comment });
+
+    document.getElementById("clientRequestForm")?.reset();
+    const customVisitTimeInput = document.getElementById("customVisitTimeInput");
+    if (customVisitTimeInput) {
+      customVisitTimeInput.value = "";
+      customVisitTimeInput.classList.add("hidden");
+    }
+    qrPrinterId = "";
     await Promise.all([loadPrinters(), loadLastRequest()]);
     showSuccess("Заявка успешно принята!");
   } catch (error) {
