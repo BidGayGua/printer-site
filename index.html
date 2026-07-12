@@ -142,7 +142,7 @@
 
     .request-grid {
       display: grid;
-      gap: 18px;
+      gap: 16px;
     }
 
     .panel {
@@ -155,7 +155,7 @@
     .panel-head {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: flex-start;
       gap: 10px;
       margin-bottom: 12px;
     }
@@ -212,11 +212,12 @@
 
     .service-options {
       display: grid;
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 10px;
     }
 
-    .service-option {
+    .service-option,
+    .add-printer-tile {
       position: relative;
       display: block;
     }
@@ -227,16 +228,17 @@
       pointer-events: none;
     }
 
-    .service-option span {
+    .service-option span,
+    .add-printer-tile {
       display: grid;
       place-items: center;
-      min-height: 52px;
-      padding: 12px;
+      min-height: 86px;
+      padding: 14px 10px;
       border-radius: 14px;
       border: 1px solid var(--line);
       background: #FFFFFF;
       color: var(--text);
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       font-weight: 800;
       text-align: center;
       cursor: pointer;
@@ -247,6 +249,14 @@
       color: #FFFFFF;
       border-color: var(--blue);
       background: var(--blue);
+      box-shadow: 0 12px 24px rgba(37, 99, 235, 0.18);
+    }
+
+    .add-printer-tile {
+      width: 100%;
+      color: #FFFFFF;
+      border: 1px solid var(--blue);
+      background: linear-gradient(145deg, #2563EB, #1E3A8A);
       box-shadow: 0 12px 24px rgba(37, 99, 235, 0.18);
     }
 
@@ -268,8 +278,8 @@
     }
 
     .consult-link {
-      width: 100%;
-      margin-top: 10px;
+      width: auto;
+      margin-top: 14px;
       color: var(--blue);
       background: #FFFFFF;
       border: 1px solid #BFDBFE;
@@ -286,6 +296,8 @@
       color: #FFFFFF;
       background: var(--blue);
       box-shadow: 0 14px 30px rgba(37, 99, 235, 0.22);
+      min-height: 54px;
+      font-size: 1rem;
     }
 
     .consult-link:hover,
@@ -311,15 +323,16 @@
 
     .field textarea,
     .field select,
+    .field input,
     .modal input {
       width: 100%;
-      padding: 12px 14px;
+      padding: 14px 15px;
       border: 1px solid var(--line);
-      border-radius: var(--radius-sm);
+      border-radius: 14px;
       background: #F8FAFC;
       color: var(--text);
       outline: none;
-      font-size: 0.92rem;
+      font-size: 1rem;
     }
 
     .field textarea {
@@ -329,6 +342,7 @@
 
     .field textarea:focus,
     .field select:focus,
+    .field input:focus,
     .modal input:focus {
       border-color: var(--blue);
       box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
@@ -336,23 +350,25 @@
     }
 
     .promo {
-      margin: 16px 0;
-      padding: 14px;
-      border-radius: 16px;
+      margin: 0 0 14px;
+      padding: 18px;
+      border-radius: 20px;
       border: 1px solid #DBEAFE;
-      background: var(--surface-soft);
+      background: linear-gradient(145deg, #EFF6FF, #FFFFFF);
+      box-shadow: 0 16px 34px rgba(37, 99, 235, 0.08);
     }
 
     .promo h3 {
       color: #1E3A8A;
-      font-size: 0.95rem;
+      font-size: 1.08rem;
       font-weight: 800;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
 
     .promo p {
       color: var(--muted);
-      font-size: 0.84rem;
+      font-size: 0.9rem;
+      line-height: 1.5;
     }
 
     .loading,
@@ -420,8 +436,7 @@
       body { padding: 32px 24px; }
       .topbar { padding: 22px; }
       .form-card { padding: 24px; }
-      .request-grid { grid-template-columns: 1.05fr 0.95fr; align-items: start; }
-      .service-options { grid-template-columns: repeat(3, 1fr); }
+      .request-grid { grid-template-columns: 1fr; }
       .modal-backdrop { place-items: center; }
     }
   </style>
@@ -448,6 +463,12 @@
         <div id="lastRequestStatus" class="status-value">Информация отсутствует</div>
       </section>
 
+      <section class="promo">
+        <h3>🎁 Скидка 10% для клиентов VAIRE</h3>
+        <p>Получите скидку на полиграфию, печать баннеров, промо-персонал и рекламные услуги.</p>
+        <a id="consultationLink" class="consult-link" href="#" target="_blank" rel="noopener">Узнать подробности в WhatsApp</a>
+      </section>
+
       <section class="card form-card">
         <h1 class="section-title">Оставить заявку</h1>
 
@@ -455,39 +476,38 @@
           <div class="request-grid">
             <div class="panel">
               <div class="panel-head">
-                <div class="panel-title">Ваши принтеры</div>
-                <button type="button" id="addPrinterBtn" class="secondary-btn">+ Добавить принтер</button>
+                <div class="panel-title">1. Выберите принтер</div>
               </div>
               <div id="printerList" class="printer-list"></div>
             </div>
 
             <div class="panel">
-              <div class="panel-title">Выберите услугу</div>
+              <div class="panel-title">2. Выберите услугу или действие</div>
               <div class="service-options" role="radiogroup" aria-label="Тип услуги">
                 <label class="service-option">
                   <input type="radio" name="serviceType" value="Замена картриджа" checked>
-                  <span>Замена картриджа</span>
+                  <span>Нужна замена картриджа</span>
                 </label>
                 <label class="service-option">
                   <input type="radio" name="serviceType" value="Ремонт">
-                  <span>Ремонт</span>
+                  <span>Принтер сломался / Ремонт</span>
                 </label>
                 <label class="service-option">
                   <input type="radio" name="serviceType" value="Консультация">
                   <span>Консультация</span>
                 </label>
+                <button type="button" id="addPrinterBtn" class="add-printer-tile">+ Добавить новый принтер</button>
               </div>
-              <a id="consultationLink" class="consult-link" href="#" target="_blank" rel="noopener">Консультация в WhatsApp</a>
             </div>
           </div>
 
           <div class="field">
-            <label for="commentInput">Комментарий</label>
+            <label for="commentInput">3. Комментарий</label>
             <textarea id="commentInput" placeholder="Опишите проблему, удобный вход или дополнительные детали"></textarea>
           </div>
 
           <div class="field">
-            <label for="visitTimeSelect">Удобное время выезда</label>
+            <label for="visitTimeSelect">4. Удобное время выезда</label>
             <select id="visitTimeSelect">
               <option value="Сегодня до 12:00">Сегодня до 12:00</option>
               <option value="Сегодня 12:00 - 15:00">Сегодня 12:00 - 15:00</option>
@@ -496,12 +516,9 @@
               <option value="Завтра 12:00 - 15:00">Завтра 12:00 - 15:00</option>
               <option value="Завтра 15:00 - 18:00">Завтра 15:00 - 18:00</option>
               <option value="В течение дня">В течение дня</option>
+              <option value="custom">Указать свое время</option>
             </select>
-          </div>
-
-          <div class="promo">
-            <h3>Реклама / Информация</h3>
-            <p>Для клиентов VAIRE действует скидка 10% на типографию, промо-персонал и рекламные услуги.</p>
+            <input type="text" id="customVisitTimeInput" class="hidden" placeholder="Например: после 17:00 или завтра к 14:30" style="margin-top: 10px;">
           </div>
 
           <button id="submitRequestBtn" class="primary-btn" type="submit">Отправить заявку</button>

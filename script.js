@@ -182,8 +182,7 @@ function renderPrinters() {
   printerList.innerHTML = clientPrinters.map((printer) => {
     const id = printer.id ?? "";
     const model = printer.model || "Модель не указана";
-    const address = printer.address || printer.location_note || "Адрес не указан";
-    const cartridge = printer.cartridge_number ? ` · Картридж: ${printer.cartridge_number}` : "";
+    const cartridge = printer.cartridge_number ? `Картридж: ${printer.cartridge_number}` : "Картридж не указан";
     const checked = String(id) === String(qrPrinterId) ? "checked" : "";
 
     return `
@@ -191,7 +190,7 @@ function renderPrinters() {
         <input type="checkbox" name="printerIds" value="${id}" ${checked}>
         <span>
           <span class="printer-name">${model}</span>
-          <span class="printer-meta">${address}${cartridge}</span>
+          <span class="printer-meta">${cartridge}</span>
         </span>
       </label>
     `;
@@ -327,7 +326,9 @@ async function submitClientRequest(event) {
   const button = document.getElementById("submitRequestBtn");
   const checkedPrinters = Array.from(document.querySelectorAll('input[name="printerIds"]:checked'));
   const serviceType = document.querySelector('input[name="serviceType"]:checked')?.value || "Замена картриджа";
-  const visitTime = document.getElementById("visitTimeSelect")?.value || "В течение дня";
+  const selectedVisitTime = document.getElementById("visitTimeSelect")?.value || "В течение дня";
+  const customVisitTime = document.getElementById("customVisitTimeInput")?.value.trim() || "";
+  const visitTime = selectedVisitTime === "custom" ? (customVisitTime || "Не указано") : selectedVisitTime;
   const comment = document.getElementById("commentInput")?.value.trim() || "";
 
   if (!checkedPrinters.length) {
@@ -387,6 +388,12 @@ async function initClientRequestApp() {
   document.getElementById("closeModalBtn")?.addEventListener("click", closeModal);
   document.getElementById("savePrinterBtn")?.addEventListener("click", addPrinter);
   document.getElementById("clientRequestForm")?.addEventListener("submit", submitClientRequest);
+  document.getElementById("visitTimeSelect")?.addEventListener("change", (event) => {
+    const customInput = document.getElementById("customVisitTimeInput");
+    if (!customInput) return;
+    customInput.classList.toggle("hidden", event.target.value !== "custom");
+    if (event.target.value === "custom") customInput.focus();
+  });
   document.getElementById("addPrinterModal")?.addEventListener("click", (event) => {
     if (event.target.id === "addPrinterModal") closeModal();
   });
