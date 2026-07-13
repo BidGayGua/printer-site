@@ -96,6 +96,75 @@ async function sendTelegramRequest({ selectedPrinters, serviceType, visitTime, c
   }
 }
 
+async function sendEmailNotification({ selectedPrinters, serviceType, visitTime, comment }) {
+  try {
+    const BREVO_API_KEY = "xsmtpsib-1aa28a34a40fc965d154f20bfe689324c6bccf3968794eac30a030773d1f37b6-yStAQhwr8baVDP1Q";
+    const EMAIL_RECIPIENT = "nikitastrumpro@gmail.com";
+    
+    const clientName = clientData?.name || "Не указан";
+    const address = selectedPrinters.find((printer) => printer.location_note || printer.address || printer.street)?.location_note
+      || selectedPrinters.find((printer) => printer.location_note || printer.address || printer.street)?.address
+      || selectedPrinters.find((printer) => printer.location_note || printer.address || printer.street)?.street
+      || clientData?.address
+      || clientData?.street
+      || "Не указан";
+
+    const printerLines = selectedPrinters
+      .map((printer) => `<li>${escapeHtml(printer.model || "Модель не указана")} (ID: ${escapeHtml(printer.id)})</li>`)
+      .join("");
+
+    const subject = `🔴 НОВАЯ ЗАЯВКА | ${serviceType} | ${clientName}`;
+    
+    const htmlContent = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #f8fafc;">
+        <h2 style="color: #1e3a8a; margin-top: 0;">🛠 Новая заявка на обслуживание</h2>
+        <div style="background-color: #ffffff; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+          <h3 style="margin-top: 0; color: #334155;">👤 Данные клиента</h3>
+          <p style="margin: 5px 0;"><b>Клиент / Компания:</b> ${clientName}</p>
+          <p style="margin: 5px 0;"><b>Телефон:</b> ${clientPhone}</p>
+          <p style="margin: 5px 0;"><b>Адрес / Кабинет:</b> ${address}</p>
+          <p style="margin: 5px 0;"><b>Выбранная услуга:</b> <strong style="color: #2563eb;">${serviceType}</strong></p>
+          <p style="margin: 5px 0;"><b>Комментарий:</b> ${comment || "Без комментария"}</p>
+        </div>
+        
+        <div style="background-color: #ffffff; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+          <h3 style="margin-top: 0; color: #334155;">🪛 Выбранные принтеры</h3>
+          <ul style="margin: 0; padding-left: 20px;">
+            ${printerLines}
+          </ul>
+        </div>
+        
+        <div style="background-color: #eff6ff; border-left: 4px solid #2563eb; padding: 15px; border-radius: 4px;">
+          <strong style="color: #1e3a8a; font-size: 16px;">⏰ Желаемое время визита:</strong> 
+          <span style="font-size: 16px; font-weight: bold;">${visitTime}</span>
+        </div>
+      </div>
+    `;
+
+    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "api-key": BREVO_API_KEY
+      },
+      body: JSON.stringify({
+        sender: { name: "VAIRE SERVICE", email: "noreply@vaireservice.com" },
+        to: [{ email: EMAIL_RECIPIENT }],
+        subject: subject,
+        htmlContent: htmlContent
+      })
+    });
+
+    if (!response.ok) {
+      console.error("Brevo API error:", await response.text());
+    } else {
+      console.log("Email sent successfully via Brevo");
+    }
+  } catch (error) {
+    console.error("Failed to send email notification:", error);
+  }
+}
+
 function generatePrinterId() {
   return "PR-" + Math.floor(100 + Math.random() * 900);
 }
@@ -487,6 +556,7 @@ async function submitClientRequest(event) {
     if (statusResult.error) throw statusResult.error;
 
     await sendTelegramRequest({ selectedPrinters, serviceType, visitTime, comment });
+    await sendEmailNotification({ selectedPrinters, serviceType, visitTime, comment });
 
     document.getElementById("clientRequestForm")?.reset();
     const customVisitTimeInput = document.getElementById("customVisitTimeInput");
