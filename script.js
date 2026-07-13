@@ -151,7 +151,7 @@ async function sendEmailNotification({ selectedPrinters, serviceType, visitTime,
         "api-key": BREVO_API_KEY
       },
       body: JSON.stringify({
-        sender: { name: "VAIRE SERVICE", email: "noreply@vaireservice.com" },
+        sender: { name: "VAIRE Service", email: "nikitastrumpro@gmail.com" },
         to: [{ email: EMAIL_RECIPIENT }],
         subject: subject,
         htmlContent: htmlContent
