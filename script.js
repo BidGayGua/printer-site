@@ -519,8 +519,17 @@ async function submitClientRequest(event) {
   const visitTime = selectedVisitTime === "custom" ? (customVisitTime || "Не указано") : selectedVisitTime;
   const comment = document.getElementById("commentInput")?.value.trim() || "";
 
-  if (!checkedPrinters.length) {
+  if (!checkedPrinters.length && serviceType !== "Консультация") {
     alert("Выберите хотя бы один принтер.");
+    return;
+  }
+
+  if (serviceType === "Консультация") {
+    const consultModal = document.getElementById("consultModal");
+    if (consultModal) {
+      consultModal.classList.remove("hidden");
+      consultModal.setAttribute("aria-hidden", "false");
+    }
     return;
   }
 
@@ -581,22 +590,32 @@ async function initClientRequestApp() {
   const content = document.getElementById("mainContent");
 
   document.querySelectorAll(".service-text").forEach(el => {
-    el.addEventListener("click", (e) => {
-      const text = el.textContent.trim();
-      if (text === "Консультация") {
-        e.preventDefault();
-        window.open("https://wa.me/77002322567?text=Здравствуйте!%20Мне%20нужна%20консультация%20по%20оргтехнике.", "_blank");
-        return;
-      }
+    el.addEventListener("click", () => {
       const hiddenInput = document.getElementById("selectedService");
       if (hiddenInput) {
-        hiddenInput.value = text;
+        hiddenInput.value = el.textContent.trim();
       }
     });
   });
 
   document.getElementById("addPrinterBtn")?.addEventListener("click", openModal);
   document.getElementById("closeModalBtn")?.addEventListener("click", closeModal);
+  
+  // Consult Modal Listeners
+  const consultModal = document.getElementById("consultModal");
+  document.getElementById("closeConsultModalBtn")?.addEventListener("click", () => {
+    if (consultModal) {
+      consultModal.classList.add("hidden");
+      consultModal.setAttribute("aria-hidden", "true");
+    }
+  });
+  document.getElementById("confirmConsultBtn")?.addEventListener("click", () => {
+    if (consultModal) {
+      consultModal.classList.add("hidden");
+      consultModal.setAttribute("aria-hidden", "true");
+    }
+  });
+
   document.getElementById("savePrinterBtn")?.addEventListener("click", addPrinter);
   document.getElementById("clientRequestForm")?.addEventListener("submit", submitClientRequest);
   document.getElementById("visitTimeSelect")?.addEventListener("change", (event) => {
