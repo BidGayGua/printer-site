@@ -12,16 +12,15 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #0A0F1C;
-      --surface: #111827;
-      --surface-soft: #1F2937;
+      --bg: #0d1117;
+      --surface: #10172A;
+      --surface-soft: #131C2E;
       --text: #F8FAFC;
+      --text-dark: #1E293B;
       --muted: #94A3B8;
-      --line: #334155;
-      --accent: #00E5FF;
-      --accent-hover: #00C2FF;
-      --accent-glow: rgba(0, 229, 255, 0.4);
-      --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      --line: #1E293B;
+      --accent: #0EA5E9;
+      --accent-hover: #0284C7;
       --radius: 24px;
       --radius-sm: 16px;
     }
@@ -47,9 +46,10 @@
 
     .card {
       background: var(--surface);
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      color: var(--text);
+      border: 1px solid var(--line);
       border-radius: var(--radius);
-      box-shadow: var(--shadow);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     }
 
     .topbar {
@@ -79,7 +79,6 @@
       font-weight: 800;
       letter-spacing: 0.5px;
       text-transform: uppercase;
-      text-shadow: 0 0 10px var(--accent-glow);
     }
 
     .hello {
@@ -101,8 +100,8 @@
     }
 
     .discount-banner {
-      background: linear-gradient(135deg, rgba(0, 229, 255, 0.1), rgba(0, 0, 0, 0));
-      border: 1px solid var(--accent);
+      background: var(--surface);
+      border: 1px solid var(--line);
       border-radius: var(--radius-sm);
       padding: 16px 24px;
       margin-bottom: 24px;
@@ -110,18 +109,7 @@
       flex-direction: column;
       align-items: center;
       text-align: center;
-      box-shadow: 0 0 20px var(--accent-glow);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .discount-banner::before {
-      content: '';
-      position: absolute;
-      top: -50%; left: -50%; width: 200%; height: 200%;
-      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
-      opacity: 0.2;
-      pointer-events: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     }
 
     .discount-title {
@@ -144,7 +132,7 @@
       align-items: center;
       justify-content: center;
       padding: 10px 20px;
-      background: rgba(0, 229, 255, 0.15);
+      background: rgba(14, 165, 233, 0.15);
       color: var(--accent);
       border: 1px solid var(--accent);
       border-radius: 12px;
@@ -157,8 +145,7 @@
 
     .discount-btn:hover {
       background: var(--accent);
-      color: #000;
-      box-shadow: 0 0 15px var(--accent);
+      color: #FFFFFF;
     }
 
     .hero-block {
@@ -182,11 +169,11 @@
       line-height: 1.1;
       margin-bottom: 16px;
       color: #FFFFFF;
-      text-shadow: 0 4px 12px rgba(0,0,0,0.5);
     }
 
     .hero-subtitle {
-      color: var(--muted);
+      color: var(--text);
+      opacity: 0.8;
       font-size: 1rem;
       max-width: 600px;
       margin: 0 auto 32px auto;
@@ -204,16 +191,16 @@
       display: flex;
       align-items: flex-start;
       gap: 12px;
-      background: var(--surface-soft);
+      background: var(--surface);
       padding: 16px;
       border-radius: var(--radius-sm);
-      border: 1px solid rgba(255,255,255,0.03);
+      border: 1px solid var(--line);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     }
 
     .benefit-icon {
       font-size: 1.4rem;
       color: var(--accent);
-      filter: drop-shadow(0 0 5px var(--accent-glow));
     }
 
     .benefit-text {
@@ -226,12 +213,13 @@
     .status-card {
       padding: 16px 20px;
       margin-bottom: 24px;
-      background: var(--surface-soft);
+      background: var(--surface);
       border: 1px solid var(--line);
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-radius: var(--radius-sm);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     }
 
     .status-label {
@@ -253,7 +241,7 @@
     }
 
     .section-title {
-      color: #FFF;
+      color: var(--text);
       font-size: 1.3rem;
       font-weight: 800;
       margin-bottom: 24px;
@@ -269,14 +257,13 @@
       height: 20px;
       background: var(--accent);
       border-radius: 4px;
-      box-shadow: 0 0 10px var(--accent-glow);
     }
 
     .panel {
       padding: 20px;
       border-radius: var(--radius-sm);
       background: var(--surface-soft);
-      border: 1px solid rgba(255,255,255,0.03);
+      border: 1px solid var(--line);
       margin-bottom: 24px;
     }
 
@@ -306,7 +293,6 @@
 
     .printer-item:hover {
       border-color: var(--accent);
-      background: rgba(0, 229, 255, 0.05);
     }
 
     .printer-item input {
@@ -321,7 +307,7 @@
     }
 
     .printer-name {
-      color: #FFF;
+      color: var(--text);
       font-size: 0.95rem;
       font-weight: 700;
     }
@@ -379,25 +365,22 @@
     }
 
     .service-option input:checked + span {
-      color: #000;
-      background: var(--accent);
+      color: #FFFFFF;
+      background: var(--surface-soft);
       border-color: var(--accent);
       font-weight: 800;
-      box-shadow: 0 0 15px var(--accent-glow);
     }
 
     .add-printer-tile {
       width: 100%;
-      color: var(--accent);
-      background: transparent;
-      border: 1px dashed var(--accent);
-      opacity: 0.8;
+      color: var(--muted);
+      background: var(--surface);
+      border: 1px dashed var(--line);
     }
 
     .add-printer-tile:hover {
-      opacity: 1;
-      background: rgba(0, 229, 255, 0.1);
-      box-shadow: 0 0 15px var(--accent-glow);
+      border-color: var(--accent);
+      color: var(--text);
     }
 
     .field {
@@ -421,7 +404,7 @@
       border: 1px solid var(--line);
       border-radius: 12px;
       background: var(--surface);
-      color: #FFF;
+      color: var(--text);
       outline: none;
       font-size: 0.95rem;
       transition: all 0.3s ease;
@@ -451,7 +434,6 @@
     .field input:focus,
     .modal input:focus {
       border-color: var(--accent);
-      box-shadow: 0 0 0 4px rgba(0, 229, 255, 0.1);
       background: var(--surface-soft);
     }
 
@@ -469,7 +451,7 @@
       min-height: 56px;
       border-radius: 16px;
       border: none;
-      color: #000;
+      color: #FFFFFF;
       background: var(--accent);
       font-size: 1.05rem;
       font-weight: 800;
@@ -477,12 +459,10 @@
       letter-spacing: 0.5px;
       cursor: pointer;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
     }
 
     .primary-btn:hover {
       transform: translateY(-2px);
-      box-shadow: 0 0 30px rgba(0, 229, 255, 0.6);
       background: var(--accent-hover);
     }
 
@@ -528,7 +508,7 @@
       display: grid;
       place-items: center;
       padding: 16px;
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(15, 23, 42, 0.7);
       backdrop-filter: blur(4px);
       z-index: 100;
     }
@@ -540,11 +520,11 @@
       border-radius: var(--radius);
       background: var(--surface);
       border: 1px solid var(--line);
-      box-shadow: 0 24px 50px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
     }
 
     .modal h2 {
-      color: #FFF;
+      color: var(--text);
       font-size: 1.2rem;
       font-weight: 800;
       margin-bottom: 20px;
@@ -576,9 +556,9 @@
       margin: 0 auto;
       padding: 16px 20px;
       border-radius: 16px;
-      color: #000;
-      background: var(--accent);
-      box-shadow: 0 10px 30px rgba(0, 229, 255, 0.4);
+      color: #FFFFFF;
+      background: #10B981;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
       font-size: 1rem;
       font-weight: 800;
       text-align: center;
