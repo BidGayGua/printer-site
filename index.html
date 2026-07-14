@@ -125,6 +125,29 @@
       font-weight: 800;
     }
 
+    .lang-switcher {
+      display: flex;
+      gap: 8px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      align-items: center;
+      margin-left: auto;
+    }
+
+    .lang-switcher span {
+      cursor: pointer;
+      color: var(--muted);
+      transition: color 0.2s;
+    }
+
+    .lang-switcher span:hover {
+      color: var(--text);
+    }
+
+    .lang-switcher span.active {
+      color: var(--accent);
+    }
+
     .hero-block {
       text-align: center;
       margin-bottom: 24px;
@@ -567,8 +590,13 @@
         <img class="brand-logo" src="123.png" alt="VAIRE GROUP">
         <span class="brand-name">VAIRE SERVICE</span>
       </div>
-      <div class="hello">
-        <span>Приветствие</span>
+      <div class="lang-switcher">
+        <span id="lang-ru" onclick="setLang('ru')">RU</span>
+        <span style="color: var(--line); cursor: default;">|</span>
+        <span id="lang-kk" onclick="setLang('kk')">KZ</span>
+      </div>
+      <div class="hello" style="text-align: right; margin-left: 10px;">
+        <span data-i18n="greeting_title">Приветствие</span>
         <strong id="clientGreeting">Здравствуйте!</strong>
       </div>
     </section>
@@ -576,134 +604,134 @@
     <section class="card topbar" style="justify-content: flex-start; gap: 16px;">
       <div style="font-size: 1.8rem;">📍</div>
       <div style="display: flex; flex-direction: column; gap: 4px; text-align: left;">
-        <span style="color: var(--accent); font-weight: 800; font-size: 0.85rem; text-transform: uppercase;">Офис и график работы</span>
-        <span style="color: #FACC15; font-weight: 800; font-size: 0.95rem;">Ежедневно с 10:00 до 19:00</span>
-        <span style="color: var(--muted); font-size: 0.85rem; font-weight: 500;">Богенбай батыра 23, 2-й этаж, 1-3 кабинет</span>
+        <span style="color: var(--accent); font-weight: 800; font-size: 0.85rem; text-transform: uppercase;" data-i18n="office_schedule">Офис и график работы</span>
+        <span style="color: #FACC15; font-weight: 800; font-size: 0.95rem;" data-i18n="office_time">Ежедневно с 10:00 до 19:00</span>
+        <span style="color: var(--muted); font-size: 0.85rem; font-weight: 500;" data-i18n="office_address">Богенбай батыра 23, 2-й этаж, 1-3 кабинет</span>
       </div>
     </section>
 
     <div class="hero-block">
-      <div class="hero-title">Сервис по заправке картриджей</div>
-      <div class="hero-slogan">ЗАПРАВКА БЕЗ ЗАБОТ</div>
-      <div class="hero-subtitle">Приезжаем, меняем картридж и вы продолжаете работу.</div>
+      <div class="hero-title" data-i18n="hero_title">Сервис по заправке картриджей</div>
+      <div class="hero-slogan" data-i18n="hero_slogan">ЗАПРАВКА БЕЗ ЗАБОТ</div>
+      <div class="hero-subtitle" data-i18n="hero_subtitle">Приезжаем, меняем картридж и вы продолжаете работу.</div>
     </div>
 
     <div class="benefits-grid">
       <div class="benefit-item">
           <div class="benefit-icon">🕒</div>
-          <div class="benefit-text">Быстрый выезд<br>в день заявки</div>
+          <div class="benefit-text" data-i18n="benefit_1">Быстрый выезд<br>в день заявки</div>
         </div>
         <div class="benefit-item">
           <div class="benefit-icon">🖨</div>
-          <div class="benefit-text">Замена картриджа<br>за 3-5 минут</div>
+          <div class="benefit-text" data-i18n="benefit_2">Замена картриджа<br>за 3-5 минут</div>
         </div>
         <div class="benefit-item">
           <div class="benefit-icon">🔄</div>
-          <div class="benefit-text">Обменный фонд<br>всегда в наличии</div>
+          <div class="benefit-text" data-i18n="benefit_3">Обменный фонд<br>всегда в наличии</div>
         </div>
         <div class="benefit-item">
           <div class="benefit-icon">🛡</div>
-          <div class="benefit-text">Гарантия качества<br>на все услуги</div>
+          <div class="benefit-text" data-i18n="benefit_4">Гарантия качества<br>на все услуги</div>
         </div>
       </div>
 
     <div class="hero-block" style="padding-top: 32px;">
-      <div class="hero-title" style="color: #FFFFFF;">КАК МЫ РАБОТАЕМ</div>
+      <div class="hero-title" style="color: #FFFFFF;" data-i18n="how_we_work">КАК МЫ РАБОТАЕМ</div>
       <div class="benefits-grid">
         <div class="benefit-item">
           <div class="benefit-icon">📱</div>
           <div class="benefit-text">
-            <span style="display: block; font-size: 0.9rem; font-weight: 800; margin-bottom: 2px;">1. Заявка</span>
-            <span style="color: var(--muted); font-size: 0.75rem;">Заказ на сайте или WhatsApp</span>
+            <span style="display: block; font-size: 0.9rem; font-weight: 800; margin-bottom: 2px;" data-i18n="step_1">1. Заявка</span>
+            <span style="color: var(--muted); font-size: 0.75rem;" data-i18n="step_1_desc">Заказ на сайте или WhatsApp</span>
           </div>
         </div>
         <div class="benefit-item">
           <div class="benefit-icon">🚗</div>
           <div class="benefit-text">
-            <span style="display: block; font-size: 0.9rem; font-weight: 800; margin-bottom: 2px;">2. Выезд</span>
-            <span style="color: var(--muted); font-size: 0.75rem;">Мастер едет к вам</span>
+            <span style="display: block; font-size: 0.9rem; font-weight: 800; margin-bottom: 2px;" data-i18n="step_2">2. Выезд</span>
+            <span style="color: var(--muted); font-size: 0.75rem;" data-i18n="step_2_desc">Мастер едет к вам</span>
           </div>
         </div>
         <div class="benefit-item">
           <div class="benefit-icon">🖨</div>
           <div class="benefit-text">
-            <span style="display: block; font-size: 0.9rem; font-weight: 800; margin-bottom: 2px;">3. Замена</span>
-            <span style="color: var(--muted); font-size: 0.75rem;">Меняем картридж за 3-5 мин</span>
+            <span style="display: block; font-size: 0.9rem; font-weight: 800; margin-bottom: 2px;" data-i18n="step_3">3. Замена</span>
+            <span style="color: var(--muted); font-size: 0.75rem;" data-i18n="step_3_desc">Меняем картридж за 3-5 мин</span>
           </div>
         </div>
         <div class="benefit-item">
           <div class="benefit-icon">✅</div>
           <div class="benefit-text">
-            <span style="display: block; font-size: 0.9rem; font-weight: 800; margin-bottom: 2px;">4. Работаем</span>
-            <span style="color: var(--muted); font-size: 0.75rem;">Вы продолжаете печать</span>
+            <span style="display: block; font-size: 0.9rem; font-weight: 800; margin-bottom: 2px;" data-i18n="step_4">4. Работаем</span>
+            <span style="color: var(--muted); font-size: 0.75rem;" data-i18n="step_4_desc">Вы продолжаете печать</span>
           </div>
         </div>
       </div>
     </div>
 
-    <div id="loadingState" class="card loading">Загружаем данные клиента...</div>
+    <div id="loadingState" class="card loading" data-i18n="loading_client">Загружаем данные клиента...</div>
     <div id="errorState" class="card error hidden">Не удалось загрузить данные. Проверьте ссылку с номером телефона.
     </div>
 
     <div id="mainContent" class="hidden">
 
       <section class="status-card">
-        <div class="status-label">Последняя заявка</div>
-        <div id="lastRequestStatus" class="status-value">Информация отсутствует</div>
+        <div class="status-label" data-i18n="last_request">Последняя заявка</div>
+        <div id="lastRequestStatus" class="status-value" data-i18n="no_info">Информация отсутствует</div>
       </section>
 
       <section class="card form-card">
-        <h1 class="section-title">Оставить заявку</h1>
+        <h1 class="section-title" data-i18n="leave_request">Оставить заявку</h1>
 
         <form id="clientRequestForm">
           <div class="panel">
-            <div class="panel-title">1. Выберите принтер</div>
+            <div class="panel-title" data-i18n="step1_title">1. Выберите принтер</div>
             <div id="printerList" class="printer-list"></div>
           </div>
 
           <div class="panel">
-            <div class="panel-title">2. Выберите услугу (можно несколько)</div>
+            <div class="panel-title" data-i18n="step2_title">2. Выберите услугу (можно несколько)</div>
             <div class="service-options" role="group" aria-label="Тип услуги">
               <label class="service-option">
                 <input type="checkbox" name="serviceType" value="Замена картриджа" checked>
-                <span class="service-text">Нужна замена картриджа</span>
+                <span class="service-text" data-i18n="service_refill">Нужна замена картриджа</span>
               </label>
               <label class="service-option">
                 <input type="checkbox" name="serviceType" value="Ремонт">
-                <span class="service-text">Принтер сломался / Ремонт</span>
+                <span class="service-text" data-i18n="service_repair">Принтер сломался / Ремонт</span>
               </label>
               <label class="service-option">
                 <input type="checkbox" name="serviceType" value="Консультация">
-                <span class="service-text">Консультация</span>
+                <span class="service-text" data-i18n="service_consult">Консультация</span>
               </label>
-              <button type="button" id="addPrinterBtn" class="add-printer-tile service-text">+ Добавить новый
+              <button type="button" id="addPrinterBtn" class="add-printer-tile service-text" data-i18n="add_printer">+ Добавить новый
                 принтер</button>
             </div>
           </div>
 
           <div class="field">
-            <label for="commentInput">3. Комментарий</label>
+            <label for="commentInput" data-i18n="step3_title">3. Комментарий</label>
             <textarea id="commentInput"
-              placeholder="Опишите проблему, удобный вход или дополнительные детали"></textarea>
+              placeholder="Опишите проблему, удобный вход или дополнительные детали" data-i18n-placeholder="comment_placeholder"></textarea>
           </div>
 
           <div class="field">
-            <label for="visitTimeSelect">4. Удобное время выезда</label>
+            <label for="visitTimeSelect" data-i18n="step4_title">4. Удобное время выезда</label>
             <select id="visitTimeSelect">
-              <option value="Сегодня до 12:00">Сегодня до 12:00</option>
-              <option value="Сегодня 12:00 - 15:00">Сегодня 12:00 - 15:00</option>
-              <option value="Сегодня 15:00 - 18:00">Сегодня 15:00 - 18:00</option>
-              <option value="Завтра до 12:00">Завтра до 12:00</option>
-              <option value="Завтра 12:00 - 15:00">Завтра 12:00 - 15:00</option>
-              <option value="Завтра 15:00 - 18:00">Завтра 15:00 - 18:00</option>
-              <option value="В течение дня">В течение дня</option>
-              <option value="custom">Указать свое время</option>
+              <option value="Сегодня до 12:00" data-i18n="time_1">Сегодня до 12:00</option>
+              <option value="Сегодня 12:00 - 15:00" data-i18n="time_2">Сегодня 12:00 - 15:00</option>
+              <option value="Сегодня 15:00 - 18:00" data-i18n="time_3">Сегодня 15:00 - 18:00</option>
+              <option value="Завтра до 12:00" data-i18n="time_4">Завтра до 12:00</option>
+              <option value="Завтра 12:00 - 15:00" data-i18n="time_5">Завтра 12:00 - 15:00</option>
+              <option value="Завтра 15:00 - 18:00" data-i18n="time_6">Завтра 15:00 - 18:00</option>
+              <option value="В течение дня" data-i18n="time_7">В течение дня</option>
+              <option value="custom" data-i18n="time_8">Указать свое время</option>
             </select>
             <input type="text" id="customVisitTimeInput" class="hidden"
               placeholder="Например: после 17:00 или завтра к 14:30" style="margin-top: 12px;">
           </div>
 
-          <button id="submitRequestBtn" class="primary-btn" type="submit">Отправить заявку</button>
+          <button id="submitRequestBtn" class="primary-btn" type="submit" data-i18n="send_request">Отправить заявку</button>
         </form>
       </section>
     </div>
@@ -711,25 +739,25 @@
 
   <div id="addPrinterModal" class="modal-backdrop hidden" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="addPrinterTitle">
-      <h2 id="addPrinterTitle">Добавить принтер</h2>
+      <h2 id="addPrinterTitle" data-i18n="modal_add_printer">Добавить принтер</h2>
       <input type="text" id="newPrinterModel" placeholder="Модель принтера, например Canon LBP6030">
       <input type="text" id="newPrinterCartridge" placeholder="Номер картриджа, например CF259A">
       <input type="text" id="newPrinterLocation" placeholder="Кабинет или адрес, например каб. 104">
       <div class="modal-actions">
-        <button type="button" id="closeModalBtn" class="secondary-btn">Отмена</button>
-        <button type="button" id="savePrinterBtn" class="primary-btn">Сохранить</button>
+        <button type="button" id="closeModalBtn" class="secondary-btn" data-i18n="cancel">Отмена</button>
+        <button type="button" id="savePrinterBtn" class="primary-btn" data-i18n="save">Сохранить</button>
       </div>
     </div>
   </div>
 
   <div id="consultModal" class="modal-backdrop hidden" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="consultModalTitle">
-      <h2 id="consultModalTitle">Консультация с мастером</h2>
-      <p style="margin: 10px 0 24px; color: var(--muted); font-size: 0.95rem; line-height: 1.5;">
+      <h2 id="consultModalTitle" data-i18n="modal_consult">Консультация с мастером</h2>
+      <p style="margin: 10px 0 24px; color: var(--muted); font-size: 0.95rem; line-height: 1.5;" data-i18n="consult_desc">
         Желаете перейти в WhatsApp для личной консультации с мастером?
       </p>
       <div class="modal-actions">
-        <button type="button" id="closeConsultModalBtn" class="secondary-btn">Отмена</button>
+        <button type="button" id="closeConsultModalBtn" class="secondary-btn" data-i18n="cancel">Отмена</button>
         <a href="https://wa.me/77002322567?text=Здравствуйте!%20Мне%20нужна%20консультация%20по%20оргтехнике."
           target="_blank" rel="noopener" class="primary-btn" id="confirmConsultBtn"
           style="text-decoration: none; text-align: center;">WhatsApp</a>
@@ -737,8 +765,9 @@
     </div>
   </div>
 
-  <div id="successToast" class="toast hidden">Заявка успешно принята!</div>
+  <div id="successToast" class="toast hidden" data-i18n="success_toast">Заявка успешно принята!</div>
 
+  <script src="translations.js"></script>
   <script src="script.js"></script>
 </body>
 
