@@ -15,6 +15,7 @@ let supabaseClient = window.supabase
   : null;
 
 const normalizePhone = (value) => String(value || "").trim();
+const uiText = (key, fallback = "") => (typeof window.t === "function" ? window.t(key, fallback) : fallback || key);
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -401,14 +402,16 @@ function renderPrinters() {
   if (!printerList) return;
 
   if (!clientPrinters.length) {
-    printerList.innerHTML = `<div class="empty-state">Принтеров пока нет. Добавьте первый принтер, чтобы создать заявку.</div>`;
+    printerList.innerHTML = `<div class="empty-state">${uiText("empty_printers", "Принтеров пока нет. Добавьте первый принтер, чтобы создать заявку.")}</div>`;
     return;
   }
 
   printerList.innerHTML = clientPrinters.map((printer) => {
     const id = printer.id ?? "";
-    const model = printer.model || "Модель не указана";
-    const cartridge = printer.cartridge_number ? `Картридж: ${printer.cartridge_number}` : "Картридж не указан";
+    const model = printer.model || uiText("unknown_model", "Модель не указана");
+    const cartridge = printer.cartridge_number
+      ? `${uiText("cartridge_label", "Картридж")}: ${printer.cartridge_number}`
+      : uiText("cartridge_missing", "Картридж не указан");
     const checked = String(id) === String(qrPrinterId) ? "checked" : "";
 
     return `
@@ -453,10 +456,10 @@ async function loadClient() {
     .maybeSingle();
 
   if (clientResult.error) throw clientResult.error;
-  clientData = clientResult.data || { phone: clientPhone, name: "клиент" };
+  clientData = clientResult.data || { phone: clientPhone, name: uiText("client", "клиент") };
 
   const greeting = document.getElementById("clientGreeting");
-  if (greeting) greeting.textContent = `Здравствуйте, ${clientData.name || "клиент"}`;
+  if (greeting) greeting.textContent = `${uiText("greeting", "Здравствуйте")}, ${clientData.name || uiText("client", "клиент")}`;
 
   await Promise.all([loadPrinters(), loadLastRequest()]);
 }
@@ -488,11 +491,11 @@ async function loadLastRequest() {
 
   const lastRequest = result.data?.[0];
   if (!lastRequest) {
-    status.textContent = "Заявок пока нет";
+    status.textContent = uiText("no_requests", "Заявок пока нет");
     return;
   }
 
-  status.textContent = `${lastRequest.service_type || "Заявка"} · ${lastRequest.visit_time || "Время не указано"}`;
+  status.textContent = `${lastRequest.service_type || uiText("request", "Заявка")} · ${lastRequest.visit_time || uiText("time_not_set", "Время не указано")}`;
 }
 
 async function addPrinter() {
@@ -506,11 +509,11 @@ async function addPrinter() {
   const location = locationInput?.value.trim() || null;
 
   if (!model) {
-    alert("Введите модель принтера.");
+    alert(uiText("model_required", "Введите модель принтера."));
     return;
   }
 
-  setBusy(button, true, "Сохраняем...", "Сохранить");
+  setBusy(button, true, uiText("saving", "Сохраняем..."), uiText("save", "Сохранить"));
 
   try {
     const newId = await generatePrinterId();
@@ -535,9 +538,9 @@ async function addPrinter() {
     closeModal();
   } catch (error) {
     console.error("Ошибка добавления принтера:", error);
-    alert("Не удалось добавить принтер. Попробуйте позже.");
+    alert(uiText("add_printer_error", "Не удалось добавить принтер. Попробуйте позже."));
   } finally {
-    setBusy(button, false, "Сохраняем...", "Сохранить");
+    setBusy(button, false, uiText("saving", "Сохраняем..."), uiText("save", "Сохранить"));
   }
 }
 
@@ -556,7 +559,7 @@ async function submitClientRequest(event) {
   const comment = document.getElementById("commentInput")?.value.trim() || "";
 
   if (!checkedPrinters.length && !serviceType.includes("Консультация")) {
-    alert("Выберите хотя бы один принтер.");
+    alert(uiText("choose_printer", "Выберите хотя бы один принтер."));
     return;
   }
 
@@ -581,7 +584,7 @@ async function submitClientRequest(event) {
     comment
   }));
 
-  setBusy(button, true, "Отправляем...", "Отправить заявку");
+  setBusy(button, true, uiText("sending", "Отправляем..."), uiText("send_request", "Отправить заявку"));
 
   try {
     const historyResult = await supabaseClient
@@ -608,12 +611,12 @@ async function submitClientRequest(event) {
     }
     qrPrinterId = "";
     await Promise.all([loadPrinters(), loadLastRequest()]);
-    showSuccess("Заявка успешно принята!");
+    showSuccess(uiText("success_toast", "Заявка успешно принята!"));
   } catch (error) {
     console.error("Ошибка отправки заявки:", error);
-    alert("Не удалось отправить заявку. Попробуйте позже.");
+    alert(uiText("submit_error", "Не удалось отправить заявку. Попробуйте позже."));
   } finally {
-    setBusy(button, false, "Отправляем...", "Отправить заявку");
+    setBusy(button, false, uiText("sending", "Отправляем..."), uiText("send_request", "Отправить заявку"));
   }
 }
 
@@ -653,6 +656,14 @@ async function initClientRequestApp() {
   });
   document.getElementById("addPrinterModal")?.addEventListener("click", (event) => {
     if (event.target.id === "addPrinterModal") closeModal();
+  });
+  document.addEventListener("languagechange", () => {
+    const greeting = document.getElementById("clientGreeting");
+    if (greeting && clientData) {
+      greeting.textContent = `${uiText("greeting", "Здравствуйте")}, ${clientData.name || uiText("client", "клиент")}`;
+    }
+    renderPrinters();
+    loadLastRequest().catch(() => {});
   });
 
   try {

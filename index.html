@@ -590,10 +590,10 @@
         <img class="brand-logo" src="123.png" alt="VAIRE GROUP">
         <span class="brand-name">VAIRE SERVICE</span>
       </div>
-      <div class="lang-switcher">
-        <span id="lang-ru" onclick="setLang('ru')">RU</span>
+      <div class="lang-switcher" aria-label="Language switcher">
+        <span id="lang-ru" data-lang="ru" onclick="setLang('ru')">RU</span>
         <span style="color: var(--line); cursor: default;">|</span>
-        <span id="lang-kk" onclick="setLang('kk')">KZ</span>
+        <span id="lang-kk" data-lang="kk" onclick="setLang('kk')">KZ</span>
       </div>
       <div class="hello" style="text-align: right; margin-left: 10px;">
         <span data-i18n="greeting_title">Приветствие</span>
@@ -670,7 +670,7 @@
     </div>
 
     <div id="loadingState" class="card loading" data-i18n="loading_client">Загружаем данные клиента...</div>
-    <div id="errorState" class="card error hidden">Не удалось загрузить данные. Проверьте ссылку с номером телефона.
+    <div id="errorState" class="card error hidden" data-i18n="load_error">Не удалось загрузить данные. Проверьте ссылку с номером телефона.
     </div>
 
     <div id="mainContent" class="hidden">
@@ -728,7 +728,8 @@
               <option value="custom" data-i18n="time_8">Указать свое время</option>
             </select>
             <input type="text" id="customVisitTimeInput" class="hidden"
-              placeholder="Например: после 17:00 или завтра к 14:30" style="margin-top: 12px;">
+              placeholder="Например: после 17:00 или завтра к 14:30" data-i18n-placeholder="custom_time_placeholder"
+              style="margin-top: 12px;">
           </div>
 
           <button id="submitRequestBtn" class="primary-btn" type="submit" data-i18n="send_request">Отправить заявку</button>
@@ -740,9 +741,9 @@
   <div id="addPrinterModal" class="modal-backdrop hidden" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="addPrinterTitle">
       <h2 id="addPrinterTitle" data-i18n="modal_add_printer">Добавить принтер</h2>
-      <input type="text" id="newPrinterModel" placeholder="Модель принтера, например Canon LBP6030">
-      <input type="text" id="newPrinterCartridge" placeholder="Номер картриджа, например CF259A">
-      <input type="text" id="newPrinterLocation" placeholder="Кабинет или адрес, например каб. 104">
+      <input type="text" id="newPrinterModel" placeholder="Модель принтера, например Canon LBP6030" data-i18n-placeholder="printer_model_placeholder">
+      <input type="text" id="newPrinterCartridge" placeholder="Номер картриджа, например CF259A" data-i18n-placeholder="cartridge_placeholder">
+      <input type="text" id="newPrinterLocation" placeholder="Кабинет или адрес, например каб. 104" data-i18n-placeholder="location_placeholder">
       <div class="modal-actions">
         <button type="button" id="closeModalBtn" class="secondary-btn" data-i18n="cancel">Отмена</button>
         <button type="button" id="savePrinterBtn" class="primary-btn" data-i18n="save">Сохранить</button>
