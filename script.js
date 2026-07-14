@@ -61,7 +61,7 @@ async function sendTelegramRequest({ selectedPrinters, serviceType, visitTime, c
     || clientData?.street
     || "Не указан";
   const printerLines = selectedPrinters
-    .map((printer) => `• ${escapeHtml(printer.model || "Модель не указана")} (${escapeHtml(printer.id)})`)
+    .map((printer) => `• ${escapeHtml(printer.model || "Модель не указана")} — Картридж: ${escapeHtml(printer.cartridge_number || "Не указан")} (${escapeHtml(printer.id)})`)
     .join("\n");
 
   const text = [
