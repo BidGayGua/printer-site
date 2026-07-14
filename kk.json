@@ -1,6 +1,7 @@
 {
   "page_title": "Принтерге қызмет көрсетуге өтінім",
   "greeting_title": "Сәлемдесу",
+  "greeting_default": "Сәлеметсіз бе!",
   "greeting": "Сәлеметсіз бе",
   "client": "клиент",
   "office_schedule": "Кеңсе және жұмыс кестесі",

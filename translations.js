@@ -4,6 +4,7 @@ const fallbackTranslations = {
   ru: {
     page_title: "Заявка на обслуживание принтера",
     greeting_title: "Приветствие",
+    greeting_default: "Здравствуйте!",
     greeting: "Здравствуйте",
     client: "клиент",
     office_schedule: "Офис и график работы",
@@ -75,6 +76,7 @@ const fallbackTranslations = {
   kk: {
     page_title: "Принтерге қызмет көрсетуге өтінім",
     greeting_title: "Сәлемдесу",
+    greeting_default: "Сәлеметсіз бе!",
     greeting: "Сәлеметсіз бе",
     client: "клиент",
     office_schedule: "Кеңсе және жұмыс кестесі",

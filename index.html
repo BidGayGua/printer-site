@@ -569,6 +569,43 @@
     }
 
     @media (max-width: 600px) {
+      .topbar {
+        gap: 10px;
+        padding: 18px 18px;
+      }
+
+      .brand {
+        gap: 9px;
+        min-width: 0;
+      }
+
+      .brand-logo {
+        height: 32px;
+      }
+
+      .brand-name {
+        font-size: 0.96rem;
+      }
+
+      .lang-switcher {
+        flex: 0 0 auto;
+        gap: 7px;
+        margin-left: 0;
+      }
+
+      .hello {
+        flex: 0 1 118px;
+        max-width: 118px;
+        min-width: 96px;
+        padding-right: 8px;
+        text-align: right;
+      }
+
+      .hello strong {
+        overflow-wrap: anywhere;
+        line-height: 1.35;
+      }
+
       .service-options {
         grid-template-columns: 1fr;
       }
@@ -595,9 +632,9 @@
         <span style="color: var(--line); cursor: default;">|</span>
         <span id="lang-kk" data-lang="kk" onclick="setLang('kk')">KZ</span>
       </div>
-      <div class="hello" style="text-align: right; margin-left: 10px;">
+      <div class="hello">
         <span data-i18n="greeting_title">Приветствие</span>
-        <strong id="clientGreeting">Здравствуйте!</strong>
+        <strong id="clientGreeting" data-i18n="greeting_default">Здравствуйте!</strong>
       </div>
     </section>
 

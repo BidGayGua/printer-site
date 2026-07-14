@@ -1,6 +1,7 @@
 {
   "page_title": "Заявка на обслуживание принтера",
   "greeting_title": "Приветствие",
+  "greeting_default": "Здравствуйте!",
   "greeting": "Здравствуйте",
   "client": "клиент",
   "office_schedule": "Офис и график работы",
